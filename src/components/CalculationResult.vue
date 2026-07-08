@@ -33,7 +33,9 @@
         },
         methods: {
             copyToClipboard() {
-                var paramsInline = this.jvmOptions.map(o => o.text).join(' ')
+                const paramsInline = this.jvmOptions
+                    .map(o => o.text.replace(/<[^>]*>/g, ''))
+                    .join(' ')
                 this.$refs.clipboardBuffer.value = paramsInline
                 this.$refs.clipboardBuffer.select()
                 document.execCommand("copy")
@@ -49,7 +51,7 @@
             <b>JVM options</b>:
             <span ref="jvmParams">
                 <template v-for="(opt, idx) in jvmOptions" :key="idx">
-                    <br/><span :class="{ optional: opt.optional }">{{opt.text}}</span>
+                    <br/><span :class="{ optional: opt.optional }" v-html="opt.text"></span>
                 </template>
             </span>
         </p>
@@ -62,7 +64,7 @@
 
 <style scoped>
     p { text-align: left; font-family: monospace;}
-    i { color: #10b981; font-style: normal;}
+    :deep(i) { color: #10b981; font-style: normal;}
     span.optional { color: rgb(102 104 103); }
     div.button { border: 1px solid gray; width: 200px; text-align: center; padding: 5px 10px; border-radius: 15px; cursor: pointer; }
     div.button:hover { border: 1px solid #719488; background: #2e3d38; }
