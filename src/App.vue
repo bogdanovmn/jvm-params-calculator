@@ -1,69 +1,70 @@
 <script setup>
+    import ConfigSelector from './components/ConfigSelector.vue'
     import Presets from './components/Presets.vue'
     import Parameters from './components/Parameters.vue'
     import CalculationResult from './components/CalculationResult.vue'
-    import {presetsConfig} from './presetsConfig.js'
+    import {configs} from './configs.js'
 </script>
 
 <script>
     export default {
         data() {
             return {
-                presets: presetsConfig,
+                configs: configs,
+                activeConfigId: configs[0].id,
+                activePresetId: configs[0].presets[0].id,
                 inputValues: {}
             }
         },
         computed: {
-            selectedPresetType() {
-                return this.presets.find((p) => p.selected);
+            activeConfig() {
+                return this.configs.find(c => c.id === this.activeConfigId)
             },
-            selectedPreset() {
-                return this.selectedPresetType
-                    .options.find((o) => o.selected);
+            activePreset() {
+                return this.activeConfig.presets.find(p => p.id === this.activePresetId)
             },
             resultValues() {
-                var values = {
-                    ...this.selectedPreset.params,
-                    ...this.inputValues
-                };
-                return values;
+                return { ...this.activePreset.values, ...this.inputValues }
             }
         },
         methods: {
-            onParametersUpdate(values) {
-                this.inputValues = values;
-            },
-            onPresetSelect(presedId) {
+            onConfigSelect(id) {
+                this.activeConfigId = id
+                this.activePresetId = this.activeConfig.presets[0].id
                 this.inputValues = {}
-                this.selectedPresetType.options.forEach(element => {
-                    element.selected = element.id == presedId
-                });
+            },
+            onPresetSelect(id) {
+                this.activePresetId = id
+                this.inputValues = {}
+            },
+            onParametersUpdate(values) {
+                this.inputValues = values
             }
         }
     }
 </script>
 
 <template>
-    <div id="menu">
-        <p class="group-title">{{selectedPresetType.name}}</p>
-        <Presets :data="selectedPresetType.options"
-            @update:preset="onPresetSelect" 
-        />
+    <div id="sidebar">
+        <p class="section-title">JVM type</p>
+        <ConfigSelector :configs="configs" :activeId="activeConfigId"
+            @select="onConfigSelect" />
     </div>
     <div id="workbench">
+        <Presets :presets="activeConfig.presets" :activeId="activePresetId"
+            @select="onPresetSelect" />
         <div id="parameters">
-            <Parameters :preset="selectedPreset"
-                @update:values="onParametersUpdate"
-            />
+            <Parameters :config="activeConfig" :preset="activePreset"
+                @update:values="onParametersUpdate" />
         </div>
-        <CalculationResult :inputValues="resultValues"/>
+        <CalculationResult :config="activeConfig" :values="resultValues"/>
     </div>
 </template>
 
 <style scoped>
-    #menu { float: left; width: 20%; margin-right: 30px; }
+    #sidebar { float: left; width: 20%; margin-right: 30px; }
     #workbench { float: right; width: 70%;}
     #parameters { margin-bottom: 50px; }
 
-    p.group-title { font-size: 150%; color: #10b981; }
+    p.section-title { font-size: 150%; color: #10b981; }
 </style>
