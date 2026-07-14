@@ -13,7 +13,7 @@
 
         computed: {
             containerLimit() {
-                return this.config.memoryCalc(this.values)
+                return Math.round(this.config.memoryCalc(this.values));
             },
             jvmOptions() {
                 return this.config.parameters

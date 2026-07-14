@@ -1,5 +1,5 @@
 export default {
-  name: 'Java 21: Serial GC',
+  name: 'Java 21: G1 GC',
   memoryCalc: (vals) => {
     const total = vals.maxHeap 
       + vals.maxMetaspace 
@@ -13,13 +13,6 @@ export default {
   },
   parameters: [
     'maxHeap',
-    { key: 'maxEden', 
-      label: 'Max Eden', 
-      type: 'slider',
-      unit: 'M', 
-      slider: { min: 16, max: (vals) => vals.maxHeap * 0.7, step: 8 },
-      formatJvm: (v) => `-Xmn<i>${v}</i>m` 
-    },
     'reservedCodeCache',
     'maxDirectMemory',
     'maxMetaspace',
@@ -27,7 +20,7 @@ export default {
     'threadStackSize',
     'threadCount',
     'containerMemoryBufferPercent',
-    { type: 'static', formatJvm: () => '-XX:+UseSerialGC' },
+    { type: 'static', formatJvm: () => '-XX:+UseG1GC' },
     { type: 'static', formatJvm: () => '-XX:+ExitOnOutOfMemoryError', optional: true },
     { type: 'static', formatJvm: () => '-XX:+UseCodeCacheFlushing', optional: true },
     { type: 'static', formatJvm: () => '-XX:+PrintFlagsFinal', optional: true },

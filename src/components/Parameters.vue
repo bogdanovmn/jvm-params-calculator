@@ -18,6 +18,14 @@
                     suffix: " K",
                     decimals: 0
                 },
+                memoryValueFormatPercent: {
+                    suffix: " %",
+                    decimals: 0
+                },
+                countValueFormat: {
+                    suffix: "",
+                    decimals: 0
+                },
                 values: { ...this.preset.values },
             }
         },
@@ -29,16 +37,21 @@
         methods: {
             getSliderMin(param) {
                 return typeof param.slider.min === 'function'
-                    ? param.slider.min(this.values)
+                    ? param.slider.min(this.values, this.preset.values)
                     : param.slider.min
             },
             getSliderMax(param) {
                 return typeof param.slider.max === 'function'
-                    ? param.slider.max(this.values)
+                    ? param.slider.max(this.values, this.preset.values)
                     : param.slider.max
             },
             getFormat(param) {
-                return param.unit === 'K' ? this.memoryValueFormatK : this.memoryValueFormat
+                switch (param.unit) {
+                    case 'K': return this.memoryValueFormatK;
+                    case 'M' : return this.memoryValueFormat;
+                    case '%' : return this.memoryValueFormatPercent;
+                    default: return this.countValueFormat;
+                }
             },
             sendUpdate() {
                 this.$emit('update:values', { ...this.values })

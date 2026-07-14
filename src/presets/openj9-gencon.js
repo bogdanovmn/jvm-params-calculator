@@ -1,12 +1,20 @@
 export default {
   name: 'OpenJ9: gencon',
-  memoryCalc: (vals) =>
-    vals.maxHeap + vals.maxJitCodeCache + vals.maxJitDataCache
-    + vals.maxDirectMemory + vals.maxClassStorage,
+  memoryCalc: (vals) => {
+    const total = vals.maxHeap 
+      + vals.maxJitCodeCache 
+      + vals.maxJitDataCache 
+      + vals.maxDirectMemory
+      + vals.maxClassStorage
+      + (vals.threadStackSize * vals.threadCount / 1024);
+    return vals.containerMemoryBufferPercent && vals.containerMemoryBufferPercent > 0
+      ? total + (total * vals.containerMemoryBufferPercent / 100)
+      : total;
+  },
   parameters: [
     'maxHeap',
     { key: 'maxNursery', label: 'Max nursery', type: 'slider',
-      unit: 'M', slider: { min: 16, max: (vals) => vals.maxHeap * 0.5, step: 8 },
+      unit: 'M', slider: { min: 16, max: (vals, preset) => preset.maxHeap * 0.5, step: 8 },
       formatJvm: (v) => `-Xmnx<i>${v}</i>m` },
     { key: 'maxTenured', label: 'Max tenured', type: 'derived',
       derive: (vals) => vals.maxHeap - vals.maxNursery,
@@ -21,6 +29,9 @@ export default {
     { key: 'maxClassStorage', label: 'Class storage', type: 'slider',
       unit: 'M', slider: { min: 16, max: 256, step: 8 },
       formatJvm: () => null },
+    'threadStackSize',
+    'threadCount',
+    'containerMemoryBufferPercent',
     { type: 'static', formatJvm: () => '-Djdk.nio.maxCachedBufferSize=262144' },
     { type: 'static', formatJvm: () => '-Xenableexplicitgc' },
     { type: 'static', formatJvm: () => '-XX:+PrintFlagsFinal', optional: true },
