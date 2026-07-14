@@ -6,8 +6,7 @@ export default {
       + vals.reservedCodeCache 
       + vals.maxDirectMemory
       + (vals.threadStackSize * vals.threadCount / 1024);
-      console.log(vals)
-    return vals.containerMemoryBufferPercent && vals.containerMemoryBufferPercent > 0
+    return vals.containerMemoryBufferPercent > 0
       ? total + (total * vals.containerMemoryBufferPercent / 100)
       : total;
   },
@@ -38,25 +37,29 @@ export default {
     { id: 1, 
       name: 'dev', 
       values: {
-        maxHeap: 512, 
+        maxHeap: 512,
+        maxEden: 256, 
         reservedCodeCache: 64,
         maxDirectMemory: 64, 
         maxMetaspace: 128, 
         compressedClassSpace: 16,
         threadStackSize: 512, 
         threadCount: 20,
+        containerMemoryBufferPercent: 0,
       }
     },
     { id: 2, 
       name: 'prod', 
       values: {
-        maxHeap: 2048, 
+        maxHeap: 2048,
+        maxEden: 512, 
         reservedCodeCache: 64,
         maxDirectMemory: 64, 
         maxMetaspace: 128, 
         compressedClassSpace: 16,
         threadStackSize: 512, 
         threadCount: 30,
+        containerMemoryBufferPercent: 0,
       }
     },
   ],

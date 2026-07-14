@@ -6,8 +6,7 @@ export default {
       + vals.reservedCodeCache 
       + vals.maxDirectMemory
       + (vals.threadStackSize * vals.threadCount / 1024);
-      console.log(vals)
-    return vals.containerMemoryBufferPercent && vals.containerMemoryBufferPercent > 0
+    return vals.containerMemoryBufferPercent > 0
       ? total + (total * vals.containerMemoryBufferPercent / 100)
       : total;
   },
@@ -38,6 +37,7 @@ export default {
         compressedClassSpace: 16,
         threadStackSize: 512, 
         threadCount: 20,
+        containerMemoryBufferPercent: 0,
       }
     },
     { id: 2, 
@@ -50,6 +50,7 @@ export default {
         compressedClassSpace: 16,
         threadStackSize: 512, 
         threadCount: 30,
+        containerMemoryBufferPercent: 0,
       }
     },
   ],
