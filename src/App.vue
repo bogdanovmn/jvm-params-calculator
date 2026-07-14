@@ -38,7 +38,13 @@
                 this.inputValues = {}
             },
             onParametersUpdate(values) {
-                this.inputValues = values
+                const { containerMemoryBufferPercent, ...rest } = values
+                this.inputValues = this.inputValues.containerMemoryBufferPercent !== undefined
+                    ? { ...rest, containerMemoryBufferPercent: this.inputValues.containerMemoryBufferPercent }
+                    : values
+            },
+            onBufferValueUpdate(val) {
+                this.inputValues = { ...this.inputValues, containerMemoryBufferPercent: val }
             }
         }
     }
@@ -57,7 +63,8 @@
             <Parameters :config="activeConfig" :preset="activePreset"
                 @update:values="onParametersUpdate" />
         </div>
-        <CalculationResult :config="activeConfig" :values="resultValues"/>
+        <CalculationResult :config="activeConfig" :values="resultValues" :preset="activePreset"
+            @update:bufferValue="onBufferValueUpdate"/>
     </div>
 </template>
 

@@ -1,5 +1,8 @@
 <script>
+    import Slider from '@vueform/slider'
+
     export default {
+        components: { Slider },
         props: {
             config: {
                 type: Object,
@@ -9,11 +12,39 @@
                 type: Object,
                 required: true
             },
+            preset: {
+                type: Object,
+                required: true
+            },
+        },
+        emits: ['update:bufferValue'],
+
+        data() {
+            return {
+                bufferValue: this.values.containerMemoryBufferPercent ?? 0,
+                memoryValueFormatPercent: {
+                    suffix: " %",
+                    decimals: 0
+                },
+            }
         },
 
         computed: {
+            bufferParam() {
+                return this.config.parameters.find(p => p.key === 'containerMemoryBufferPercent')
+            },
             containerLimit() {
                 return Math.round(this.config.memoryCalc(this.values));
+            },
+            bufferSliderMin() {
+                return typeof this.bufferParam.slider.min === 'function'
+                    ? this.bufferParam.slider.min(this.values, this.preset.values)
+                    : this.bufferParam.slider.min
+            },
+            bufferSliderMax() {
+                return typeof this.bufferParam.slider.max === 'function'
+                    ? this.bufferParam.slider.max(this.values, this.preset.values)
+                    : this.bufferParam.slider.max
             },
             jvmOptions() {
                 return this.config.parameters
@@ -39,6 +70,17 @@
                 this.$refs.clipboardBuffer.value = paramsInline
                 this.$refs.clipboardBuffer.select()
                 document.execCommand("copy")
+            },
+            onBufferChange(val) {
+                this.$emit('update:bufferValue', val)
+            },
+        },
+        watch: {
+            values: {
+                handler(newVals) {
+                    this.bufferValue = newVals.containerMemoryBufferPercent ?? 0
+                },
+                deep: true
             }
         }
     }
@@ -46,7 +88,21 @@
 <template>
     <div>
         <h1>Calculation result</h1>
-        <p><b>Container memory limit</b>: <i><b>{{containerLimit}}</b> Mb</i></p>
+        <p class="buffer-slider" v-if="bufferParam">
+            <i>{{bufferParam.label}}</i>
+            <Slider v-model="bufferValue"
+                :min="bufferSliderMin"
+                :max="bufferSliderMax"
+                :step="bufferParam.slider.step"
+                :format="memoryValueFormatPercent"
+                :showTooltip="'always'"
+                tooltipPosition="bottom"
+                :lazy="false"
+                @change="onBufferChange"
+                :key="preset.id + '-buffer'"
+            />
+        </p>
+        <p class="resume"><b>Container memory limit</b>: <i><b>{{containerLimit}}</b> Mb</i></p>
         <p>
             <b>JVM options</b>:
             <span ref="jvmParams">
@@ -62,8 +118,14 @@
     <textarea class="hidden" ref="clipboardBuffer"/>
 </template>
 
+<style src="@vueform/slider/themes/default.css">
+</style>
+
 <style scoped>
     p { text-align: left; font-family: monospace;}
+    p.resume { margin: 50px 0 20px 0; }
+    p.buffer-slider { margin-bottom: 40px; text-align: center; font-family: sans-serif; font-size: 0.95em; }
+    p.buffer-slider i { color: rgb(102 104 103); font-style: normal; }
     :deep(i) { color: #10b981; font-style: normal;}
     span.optional { color: rgb(102 104 103); }
     div.button { border: 1px solid gray; width: 200px; text-align: center; padding: 5px 10px; border-radius: 15px; cursor: pointer; }
@@ -71,6 +133,8 @@
     .hidden { margin-left: -99999px}
 
     @media (prefers-color-scheme: light) {
+        p.buffer-slider i { color: rgb(191, 188, 188); }
+
         span.optional { color: rgb(191, 188, 188); }
         div.button:hover { border: 1px solid #719488; background: #dbf8ee; }
     }

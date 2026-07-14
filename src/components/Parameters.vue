@@ -31,7 +31,7 @@
         },
         computed: {
             sliderParams() {
-                return this.config.parameters.filter(p => p.type === 'slider')
+                return this.config.parameters.filter(p => p.type === 'slider' && p.key !== 'containerMemoryBufferPercent')
             }
         },
         methods: {
@@ -79,6 +79,7 @@
             tooltipPosition="bottom"
             :lazy="false"
             @change="sendUpdate"
+            :key="preset.id + '-' + param.key"
         />
     </p>
 </template>
