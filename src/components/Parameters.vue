@@ -4,50 +4,63 @@
     export default {
         components: { Slider },
         props: {
+            config: { type: Object, required: true },
             preset: { type: Object, required: true }
         },
+        emits: ['update:values'],
         data() {
             return {
                 memoryValueFormat: { 
                     suffix:  " M", 
                     decimals: 0
                 },
-                input: {
-                    maxHeap: this.preset.params.maxHeap,
-                    maxNursery: this.preset.params.maxNursery,
-                    maxDirectMemory: this.preset.params.maxDirectMemory,
-                    maxJitCodeCache: this.preset.params.maxJitCodeCache,
-                    maxJitDataCache: this.preset.params.maxJitDataCache,
-                    maxClassStorage: this.preset.params.maxClassStorage,
+                memoryValueFormatK: {
+                    suffix: " K",
+                    decimals: 0
                 },
-                slider: {
-                    heap: {
-                        min: this.preset.params.maxHeap / 2,
-                        max: this.preset.params.maxHeap * 3
-                    }
-                }
+                memoryValueFormatPercent: {
+                    suffix: " %",
+                    decimals: 0
+                },
+                countValueFormat: {
+                    suffix: "",
+                    decimals: 0
+                },
+                values: { ...this.preset.values },
+            }
+        },
+        computed: {
+            sliderParams() {
+                return this.config.parameters.filter(p => p.type === 'slider' && p.key !== 'containerMemoryBufferPercent')
             }
         },
         methods: {
+            getSliderMin(param) {
+                return typeof param.slider.min === 'function'
+                    ? param.slider.min(this.values, this.preset.values)
+                    : param.slider.min
+            },
+            getSliderMax(param) {
+                return typeof param.slider.max === 'function'
+                    ? param.slider.max(this.values, this.preset.values)
+                    : param.slider.max
+            },
+            getFormat(param) {
+                switch (param.unit) {
+                    case 'K': return this.memoryValueFormatK;
+                    case 'M' : return this.memoryValueFormat;
+                    case '%' : return this.memoryValueFormatPercent;
+                    default: return this.countValueFormat;
+                }
+            },
             sendUpdate() {
-                this.$emit("update:values", this.input)
+                this.$emit('update:values', { ...this.values })
             }
         },
         watch: { 
             preset(newPreset) {
-                console.log(`changing preset: ${newPreset.name}`);
-                var maxHeap = newPreset.params.maxHeap;
-                this.input.maxHeap = maxHeap;
-                this.input.maxNursery = newPreset.params.maxNursery;
-                this.input.maxDirectMemory = this.preset.params.maxDirectMemory;
-                this.input.maxJitCodeCache = this.preset.params.maxJitCodeCache;
-                this.input.maxJitDataCache = this.preset.params.maxJitDataCache;
-                this.input.maxClassStorage = this.preset.params.maxClassStorage;
-                console.log(`heap = ${this.input.maxHeap} nursery = ${this.input.maxNursery}`);
-                this.slider.heap = {
-                    min: maxHeap / 2,
-                    max: maxHeap * 3
-                }
+                this.values = { ...newPreset.values }
+                this.sendUpdate()
             }
         }
     }
@@ -55,82 +68,18 @@
 
 <template>
     <h1>JVM parameters</h1>
-    <p>
-        <i>Max</i> heap
-        <Slider v-model="input.maxHeap" 
-            :min="slider.heap.min" 
-            :max="slider.heap.max" 
-            :step="16"
-            :format="memoryValueFormat"
+    <p v-for="param in sliderParams" :key="param.key">
+        <i>{{param.label}}</i>
+        <Slider v-model="values[param.key]" 
+            :min="getSliderMin(param)"
+            :max="getSliderMax(param)"
+            :step="param.slider.step"
+            :format="getFormat(param)"
             :showTooltip="'always'"
             tooltipPosition="bottom"
             :lazy="false"
             @change="sendUpdate"
-        />
-    </p>
-    <p>
-        <i>Max</i> nursery
-        <Slider v-model="input.maxNursery"
-            :min="16"
-            :max="input.maxHeap * 0.5"
-            :step="8" 
-            :format="memoryValueFormat"
-            :lazy="false"
-            :showTooltip="'always'"
-            tooltipPosition="bottom"
-            @change="sendUpdate"
-        />
-    </p>
-    <p>
-        <i>Max</i> direct memory <i>(non-heap)</i>
-        <Slider v-model="input.maxDirectMemory"
-            :min="16"
-            :max="slider.heap.max"
-            :step="16" 
-            :format="memoryValueFormat"
-            :lazy="false"
-            :showTooltip="'always'"
-            tooltipPosition="bottom"
-            @change="sendUpdate"
-        />
-    </p>
-    <p>
-        <i>Max</i> JIT code cache <i>(non-heap)</i>
-        <Slider v-model="input.maxJitCodeCache"
-            :min="16"
-            :max="384"
-            :step="8" 
-            :format="memoryValueFormat"
-            :lazy="false"
-            :showTooltip="'always'"
-            tooltipPosition="bottom"
-            @change="sendUpdate"
-        />
-    </p>
-    <p>
-        <i>Max</i> JIT data cache <i>(non-heap)</i>
-        <Slider v-model="input.maxJitDataCache"
-            :min="16"
-            :max="256"
-            :step="8" 
-            :format="memoryValueFormat"
-            :lazy="false"
-            :showTooltip="'always'"
-            tooltipPosition="bottom"
-            @change="sendUpdate"
-        />
-    </p>
-    <p>
-        <i>Max</i> class storage <i>(non-heap)</i>
-        <Slider v-model="input.maxClassStorage"
-            :min="16"
-            :max="256"
-            :step="8" 
-            :format="memoryValueFormat"
-            :lazy="false"
-            :showTooltip="'always'"
-            tooltipPosition="bottom"
-            @change="sendUpdate"
+            :key="preset.id + '-' + param.key"
         />
     </p>
 </template>

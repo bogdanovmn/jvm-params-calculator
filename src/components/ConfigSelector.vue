@@ -1,12 +1,12 @@
 <script>
     export default {
         props: {
-            presets: {
+            configs: {
                 type: Array,
                 required: true
             },
             activeId: {
-                type: Number,
+                type: String,
                 required: true
             }
         },
@@ -15,51 +15,42 @@
 </script>
 
 <template>
-    <div class="presets-row">
-        <div v-for="preset of presets"
-            :key="preset.id"
-            :class="{ selected : preset.id === activeId }"
-            class="preset-tab"
-            @click="$emit('select', preset.id)"
-        >
-            {{preset.name}}
-        </div>
+    <div v-for="config of configs"
+        :key="config.id"
+        :class="{ selected : config.id === activeId }"
+        class="config-item"
+        @click="$emit('select', config.id)"
+    >
+        <h1>{{config.name}}</h1>
     </div>
 </template>
 
 <style scoped>
-    .presets-row {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-        margin-bottom: 25px;
-    }
-    .preset-tab {
+    .config-item {
         border: 1px solid gray;
         border-radius: 15px;
-        padding: 5px 15px;
+        margin-bottom: 15px;
         cursor: pointer;
-        font-size: 0.95em;
+        padding: 5px 10px;
     }
-    .preset-tab:hover {
+    .config-item:hover {
         border: 1px solid #719488;
         background: #2e3d38;
     }
-    .preset-tab.selected {
+    .config-item.selected {
         border: 2px solid #0b845c;
         background-color: #10b981;
-        color: #fff;
     }
+    h1 { font-size: 1.1em; margin: 5px 0; }
 
     @media (prefers-color-scheme: light) {
-        .preset-tab:hover {
+        .config-item:hover {
             border: 1px solid #719488;
             background: #dbf8ee;
         }
-        .preset-tab.selected {
+        .config-item.selected {
             border: 2px solid #0b845c;
             background-color: #10b981;
-            color: #fff;
         }
     }
 </style>
