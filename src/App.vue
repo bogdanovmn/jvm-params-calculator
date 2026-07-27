@@ -55,10 +55,11 @@
         <p class="section-title">JVM type</p>
         <ConfigSelector :configs="configs" :activeId="activeConfigId"
             @select="onConfigSelect" />
-    </div>
-    <div id="workbench">
+        <p class="section-title">Presets</p>
         <Presets :presets="activeConfig.presets" :activeId="activePresetId"
             @select="onPresetSelect" />
+    </div>
+    <div id="workbench">
         <div id="parameters">
             <Parameters :config="activeConfig" :preset="activePreset"
                 @update:values="onParametersUpdate" />
