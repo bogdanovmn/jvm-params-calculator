@@ -16,6 +16,7 @@ export default {
       label: 'Max Eden', 
       type: 'slider',
       unit: 'M', 
+      group: 'Heap',
       slider: { min: 16, max: (vals) => vals.maxHeap * 0.7, step: 8 },
       formatJvm: (v) => `-Xmn<i>${v}</i>m` 
     },
