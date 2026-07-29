@@ -1,8 +1,9 @@
 <script>
     import Slider from '@vueform/slider'
+    import Card from './Card.vue'
 
     export default {
-        components: { Slider },
+        components: { Slider, Card },
         props: {
             config: {
                 type: Object,
@@ -88,10 +89,9 @@
 <template>
     <div>
         <h1>Calculation result</h1>
-        <div class="buffer-card" v-if="bufferParam">
-            <p class="buffer-title">Container memory limit</p>
+        <Card v-if="bufferParam" type="result" title="Container memory limit">
             <p class="container-limit">{{containerLimit}} Mb</p>
-            <p class="buffer-slider-label"><i>{{bufferParam.label}}</i></p>
+            <i>{{bufferParam.label}}</i>
             <Slider v-model="bufferValue"
                 :min="bufferSliderMin"
                 :max="bufferSliderMax"
@@ -103,7 +103,7 @@
                 @change="onBufferChange"
                 :key="preset.id + '-buffer'"
             />
-        </div>
+        </Card>
         <p>
             <b>JVM options</b>:
             <span ref="jvmParams">
@@ -130,27 +130,6 @@
     div.button:hover { border: 1px solid #719488; background: #2e3d38; }
     .hidden { margin-left: -99999px}
 
-    .buffer-card {
-        border: 1px solid rgba(251, 146, 60, 0.15);
-        border-radius: 12px;
-        padding: 16px 20px;
-        padding-top: 10px;
-        margin-bottom: 30px;
-        background: rgba(251, 146, 60, 0.04);
-    }
-    .buffer-card p:last-child {
-        margin-bottom: 0;
-    }
-    .buffer-title {
-        font-size: 1.15em;
-        font-weight: 600;
-        color: rgba(251, 146, 60, 0.6);
-        margin-bottom: 16px;
-        padding-bottom: 8px;
-        border-bottom: 0px solid rgba(251, 146, 60, 0.08);
-        font-family: sans-serif;
-        text-align: center;
-    }
     .container-limit {
         text-align: center;
         font-size: 1.6em;
@@ -160,44 +139,33 @@
         margin-bottom: 20px;
         font-family: sans-serif;
     }
-    .buffer-slider-label {
-        margin-bottom: 8px;
-    }
-    .buffer-slider-label i { color: rgb(102 104 103); font-style: normal; }
-    .buffer-card :deep(.slider-connect) {
+    i { color: rgb(102 104 103); font-style: normal; }
+    :deep(.slider-connect) {
         background: #fb923c;
     }
-    .buffer-card :deep(.slider-tooltip) {
+    :deep(.slider-tooltip) {
         background: #fb923c;
         border-color: #fb923c;
     }
-    .buffer-card :deep(.slider-handle) {
+    :deep(.slider-handle) {
         border-color: #fb923c;
     }
 
     @media (prefers-color-scheme: light) {
         span.optional { color: rgb(191, 188, 188); }
         div.button:hover { border: 1px solid #719488; background: #dbf8ee; }
-        .buffer-card {
-            border-color: rgba(234, 88, 12, 0.15);
-            background: rgba(234, 88, 12, 0.04);
-        }
-        .buffer-title {
-            color: rgba(234, 88, 12, 0.6);
-            border-bottom-color: rgba(234, 88, 12, 0.08);
-        }
         .container-limit {
             color: #ea580c;
         }
         .buffer-slider-label i { color: rgb(191, 188, 188); }
-        .buffer-card :deep(.slider-connect) {
+        :deep(.slider-connect) {
             background: #ea580c;
         }
-        .buffer-card :deep(.slider-tooltip) {
+        :deep(.slider-tooltip) {
             background: #ea580c;
             border-color: #ea580c;
         }
-        .buffer-card :deep(.slider-handle) {
+        :deep(.slider-handle) {
             border-color: #ea580c;
         }
     }
