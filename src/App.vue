@@ -55,23 +55,24 @@
         <p class="section-title">JVM type</p>
         <ConfigSelector :configs="configs" :activeId="activeConfigId"
             @select="onConfigSelect" />
-    </div>
-    <div id="workbench">
+        <p class="section-title">Presets</p>
         <Presets :presets="activeConfig.presets" :activeId="activePresetId"
             @select="onPresetSelect" />
-        <div id="parameters">
-            <Parameters :config="activeConfig" :preset="activePreset"
-                @update:values="onParametersUpdate" />
-        </div>
+    </div>
+    <div id="parameters">
+        <Parameters :config="activeConfig" :preset="activePreset"
+            @update:values="onParametersUpdate" />
+    </div>
+    <div id="result">
         <CalculationResult :config="activeConfig" :values="resultValues" :preset="activePreset"
             @update:bufferValue="onBufferValueUpdate"/>
     </div>
 </template>
 
 <style scoped>
-    #sidebar { float: left; width: 20%; margin-right: 30px; }
-    #workbench { float: right; width: 70%;}
-    #parameters { margin-bottom: 50px; }
+    #sidebar { width: 200px; flex-shrink: 0; }
+    #parameters { width: 500px; flex-shrink: 0; }
+    #result { width: 500px; flex-shrink: 0; }
 
     p.section-title { font-size: 150%; color: #10b981; }
 </style>

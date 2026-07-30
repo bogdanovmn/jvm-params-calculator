@@ -1,8 +1,9 @@
 <script>
     import Slider from '@vueform/slider'
+    import Card from './Card.vue'
 
     export default {
-        components: { Slider },
+        components: { Slider, Card },
         props: {
             config: { type: Object, required: true },
             preset: { type: Object, required: true }
@@ -32,6 +33,20 @@
         computed: {
             sliderParams() {
                 return this.config.parameters.filter(p => p.type === 'slider' && p.key !== 'containerMemoryBufferPercent')
+            },
+            groupedSliders() {
+                const groups = []
+                const seen = new Set()
+                for (const param of this.sliderParams) {
+                    const group = param.group || null
+                    if (group && !seen.has(group)) {
+                        seen.add(group)
+                        groups.push({ title: group, items: this.sliderParams.filter(p => p.group === group) })
+                    } else if (!group) {
+                        groups.push({ title: null, items: [param] })
+                    }
+                }
+                return groups
             }
         },
         methods: {
@@ -68,20 +83,38 @@
 
 <template>
     <h1>JVM parameters</h1>
-    <p v-for="param in sliderParams" :key="param.key">
-        <i>{{param.label}}</i>
-        <Slider v-model="values[param.key]" 
-            :min="getSliderMin(param)"
-            :max="getSliderMax(param)"
-            :step="param.slider.step"
-            :format="getFormat(param)"
-            :showTooltip="'always'"
-            tooltipPosition="bottom"
-            :lazy="false"
-            @change="sendUpdate"
-            :key="preset.id + '-' + param.key"
-        />
-    </p>
+    <template v-for="(group, gi) in groupedSliders" :key="gi">
+        <Card v-if="group.title" type="normal" :title="group.title">
+            <p v-for="param in group.items" :key="param.key">
+                <i>{{param.label}}</i>
+                <Slider v-model="values[param.key]" 
+                    :min="getSliderMin(param)"
+                    :max="getSliderMax(param)"
+                    :step="param.slider.step"
+                    :format="getFormat(param)"
+                    :showTooltip="'always'"
+                    tooltipPosition="bottom"
+                    :lazy="false"
+                    @change="sendUpdate"
+                    :key="preset.id + '-' + param.key"
+                />
+            </p>
+        </Card>
+        <p v-else v-for="param in group.items" :key="param.key">
+            <i>{{param.label}}</i>
+            <Slider v-model="values[param.key]" 
+                :min="getSliderMin(param)"
+                :max="getSliderMax(param)"
+                :step="param.slider.step"
+                :format="getFormat(param)"
+                :showTooltip="'always'"
+                tooltipPosition="bottom"
+                :lazy="false"
+                @change="sendUpdate"
+                :key="preset.id + '-' + param.key"
+            />
+        </p>
+    </template>
 </template>
 
 <style src="@vueform/slider/themes/default.css">

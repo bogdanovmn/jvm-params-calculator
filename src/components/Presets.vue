@@ -30,16 +30,14 @@
 <style scoped>
     .presets-row {
         display: flex;
+        flex-direction: column;
         gap: 10px;
-        flex-wrap: wrap;
-        margin-bottom: 25px;
     }
     .preset-tab {
         border: 1px solid gray;
         border-radius: 15px;
-        padding: 5px 15px;
         cursor: pointer;
-        font-size: 0.95em;
+        padding: 5px 10px;
     }
     .preset-tab:hover {
         border: 1px solid #719488;
@@ -48,7 +46,6 @@
     .preset-tab.selected {
         border: 2px solid #0b845c;
         background-color: #10b981;
-        color: #fff;
     }
 
     @media (prefers-color-scheme: light) {
@@ -59,7 +56,6 @@
         .preset-tab.selected {
             border: 2px solid #0b845c;
             background-color: #10b981;
-            color: #fff;
         }
     }
 </style>

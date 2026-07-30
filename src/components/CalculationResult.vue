@@ -1,8 +1,9 @@
 <script>
     import Slider from '@vueform/slider'
+    import Card from './Card.vue'
 
     export default {
-        components: { Slider },
+        components: { Slider, Card },
         props: {
             config: {
                 type: Object,
@@ -88,7 +89,8 @@
 <template>
     <div>
         <h1>Calculation result</h1>
-        <p class="buffer-slider" v-if="bufferParam">
+        <Card v-if="bufferParam" type="result" title="Container memory limit">
+            <p class="container-limit">{{containerLimit}} Mb</p>
             <i>{{bufferParam.label}}</i>
             <Slider v-model="bufferValue"
                 :min="bufferSliderMin"
@@ -101,8 +103,7 @@
                 @change="onBufferChange"
                 :key="preset.id + '-buffer'"
             />
-        </p>
-        <p class="resume"><b>Container memory limit</b>: <i><b>{{containerLimit}}</b> Mb</i></p>
+        </Card>
         <p>
             <b>JVM options</b>:
             <span ref="jvmParams">
@@ -123,19 +124,49 @@
 
 <style scoped>
     p { text-align: left; font-family: monospace;}
-    p.resume { margin: 50px 0 20px 0; }
-    p.buffer-slider { margin-bottom: 40px; text-align: center; font-family: sans-serif; font-size: 0.95em; }
-    p.buffer-slider i { color: rgb(102 104 103); font-style: normal; }
     :deep(i) { color: #10b981; font-style: normal;}
     span.optional { color: rgb(102 104 103); }
     div.button { border: 1px solid gray; width: 200px; text-align: center; padding: 5px 10px; border-radius: 15px; cursor: pointer; }
     div.button:hover { border: 1px solid #719488; background: #2e3d38; }
     .hidden { margin-left: -99999px}
 
-    @media (prefers-color-scheme: light) {
-        p.buffer-slider i { color: rgb(191, 188, 188); }
+    .container-limit {
+        text-align: center;
+        font-size: 1.6em;
+        font-weight: 700;
+        color: #fb923c;
+        margin-top: 0;
+        margin-bottom: 20px;
+        font-family: sans-serif;
+    }
+    i { color: rgb(102 104 103); font-style: normal; }
+    :deep(.slider-connect) {
+        background: #fb923c;
+    }
+    :deep(.slider-tooltip) {
+        background: #fb923c;
+        border-color: #fb923c;
+    }
+    :deep(.slider-handle) {
+        border-color: #fb923c;
+    }
 
+    @media (prefers-color-scheme: light) {
         span.optional { color: rgb(191, 188, 188); }
         div.button:hover { border: 1px solid #719488; background: #dbf8ee; }
+        .container-limit {
+            color: #ea580c;
+        }
+        .buffer-slider-label i { color: rgb(191, 188, 188); }
+        :deep(.slider-connect) {
+            background: #ea580c;
+        }
+        :deep(.slider-tooltip) {
+            background: #ea580c;
+            border-color: #ea580c;
+        }
+        :deep(.slider-handle) {
+            border-color: #ea580c;
+        }
     }
 </style>
