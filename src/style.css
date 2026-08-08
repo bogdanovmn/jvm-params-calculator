@@ -41,6 +41,20 @@ h1 {
   gap: 30px;
 }
 
+@media (max-width: 510px) {
+  #app {
+    padding: 0.5rem;
+    gap: 18px;
+    zoom: 0.7;
+  }
+}
+
+@media (max-width: 390px) {
+  #app {
+    zoom: 0.55;
+  }
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
